@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Denní výkaz — Docházka</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; padding: 1rem; }
+  .wrap { max-width: 420px; margin: 0 auto; }
+  .top-bar { background: #1F4E78; color: white; padding: 14px 16px; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 10px; }
+  .top-bar h1 { font-size: 16px; font-weight: 600; }
+  .top-bar span { font-size: 12px; opacity: .75; display: block; }
+  .body { background: white; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; padding: 1.25rem; }
+  .field { margin-bottom: 1rem; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 5px; letter-spacing: .04em; text-transform: uppercase; }
+  .field select, .field input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 15px; color: #1e293b; -webkit-appearance: none; }
+  .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: #f8fafc; padding-right: 32px; }
+  .field input[type=number] { font-size: 22px; font-weight: 600; text-align: center; color: #1F4E78; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #94a3b8; text-transform: uppercase; margin: 1.25rem 0 .75rem; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; }
+  .toggle-btn { font-size: 13px; color: #2563eb; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: .75rem; background: none; border: none; padding: 0; }
+  .optional-section { border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 1rem; background: #fafafa; }
+  .submit-btn { width: 100%; padding: 14px; border-radius: 8px; background: #1F4E78; border: none; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: .5rem; transition: opacity .15s; }
+  .submit-btn:hover { opacity: .9; }
+  .submit-btn:disabled { opacity: .6; cursor: not-allowed; }
+  .success { display: none; text-align: center; padding: 2rem 1rem; }
+  .success h2 { font-size: 20px; font-weight: 600; color: #1e293b; margin: 1rem 0 .5rem; }
+  .success p { font-size: 14px; color: #64748b; line-height: 1.7; }
+  .new-btn { margin-top: 1.5rem; padding: 10px 24px; border-radius: 8px; border: 1px solid #cbd5e1; background: transparent; color: #1e293b; font-size: 14px; cursor: pointer; }
+  .error-msg { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 1rem; display: none; }
+  .spinner { display: none; text-align: center; font-size: 14px; color: #64748b; padding: .5rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar">
+    <div>
+      <h1>Denní výkaz</h1>
+      <span id="dnes-label"></span>
+    </div>
+  </div>
+
+  <div class="body">
+    <div id="form-area">
+      <div id="error-msg" class="error-msg"></div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>Pracovník</label>
+          <select id="pracovnik">
+            <option value="">— vyber jméno —</option>
+            <option>Jan Pavka</option>
+            <option>Petr Pyža</option>
+            <option>David Malík</option>
+            <option>Erik Slezák</option>
+            <option>Robert Žajdlík</option>
+            <option>Mishai Barshai</option>
+            <option>Ihor Mezhul</option>
+            <option>Alex Fabritsi</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Den v měsíci</label>
+          <select id="den"></select>
+        </div>
+      </div>
+
+      <p class="section-label">Stavba A</p>
+      <div class="field">
+        <label>Stavba</label>
+        <select id="stavbaA">
+          <option value="">— vyber stavbu —</option>
+          <option>RD Sklenkovi</option><option>RD Horští</option><option>RD Štěpánovi</option>
+          <option>RD Hellingerovi</option><option>RD Barot</option><option>RD Piskoř</option>
+          <option>RD Nekudová</option><option>RD Špaček</option><option>RD Orsák</option>
+          <option>RD Fuhrmanovi</option><option>RD Kolář 3</option><option>RD Skřivánkovi</option>
+          <option>RD Kotolan</option><option>RD Šupková</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Etapa</label>
+        <select id="etapaA">
+          <option value="">— vyber etapu —</option>
+          <option>Projekce</option><option>Základová deska</option><option>Hydroizolace ZD</option>
+          <option>Výroba</option><option>Hrubá stavba</option><option>Fasáda</option>
+          <option>Okna</option><option>Palubkové podbití</option><option>Parotěsnost</option>
+          <option>Instalace</option><option>Záklop/SDK/Betonáž</option>
+          <option>Interiérové práce</option><option>Připojení na IS</option>
+          <option>Závoz</option><option>Režie</option><option>Reklamace</option>
+          <option>Opravy vlastní práce</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Počet hodin</label>
+        <input type="number" id="hodinyA" min="0.5" max="16" step="0.5" placeholder="8" />
+      </div>
+
+      <button class="toggle-btn" id="toggle-b" onclick="toggleB()">+ Přidat druhou stavbu (nepovinné)</button>
+      <div id="sekce-b" style="display:none;">
+        <div class="optional-section">
+          <p class="section-label" style="margin-top:0;">Stavba B</p>
+          <div class="field">
+            <label>Stavba</label>
+            <select id="stavbaB">
+              <option value="">— vyber stavbu —</option>
+              <option>RD Sklenkovi</option><option>RD Horští</option><option>RD Štěpánovi</option>
+              <option>RD Hellingerovi</option><option>RD Barot</option><option>RD Piskoř</option>
+              <option>RD Nekudová</option><option>RD Špaček</option><option>RD Orsák</option>
+              <option>RD Fuhrmanovi</option><option>RD Kolář 3</option><option>RD Skřivánkovi</option>
+              <option>RD Kotolan</option><option>RD Šupková</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Etapa</label>
+            <select id="etapaB">
+              <option value="">— vyber etapu —</option>
+              <option>Projekce</option><option>Základová deska</option><option>Hydroizolace ZD</option>
+              <option>Výroba</option><option>Hrubá stavba</option><option>Fasáda</option>
+              <option>Okna</option><option>Palubkové podbití</option><option>Parotěsnost</option>
+              <option>Instalace</option><option>Záklop/SDK/Betonáž</option>
+              <option>Interiérové práce</option><option>Připojení na IS</option>
+              <option>Závoz</option><option>Režie</option><option>Reklamace</option>
+              <option>Opravy vlastní práce</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Počet hodin</label>
+            <input type="number" id="hodinyB" min="0.5" max="16" step="0.5" placeholder="4" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Poznámka (nepovinné)</label>
+        <input type="text" id="poznamka" placeholder="např. přesčas, jízda..." />
+      </div>
+
+      <div class="spinner" id="spinner">Odesílám...</div>
+      <button class="submit-btn" id="submit-btn" onclick="odeslat()">Odeslat výkaz</button>
+    </div>
+
+    <div class="success" id="success-area">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <circle cx="26" cy="26" r="24" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
+        <polyline points="15 27 23 35 37 18" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Výkaz odeslán</h2>
+      <p id="success-detail"></p>
+      <button class="new-btn" onclick="reset()">Zadat další den</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// DŮLEŽITÉ: Sem vložte URL vašeho Apps Script Web App
+// (viz návod — získáte ji po nasazení scriptu)
+// ════════════════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjgWVmMbbg9eXNsUKEhMNNgTHP9ymTCkyVVRDBq2VYGkPrcLp0_TDVnQGeIlpPumZX/exec';
+// ════════════════════════════════════════════════════════
+
+const dnes = new Date();
+const dny = ['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'];
+const mesice = ['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
+document.getElementById('dnes-label').textContent =
+  dny[dnes.getDay()] + ' ' + dnes.getDate() + '. ' + mesice[dnes.getMonth()] + ' ' + dnes.getFullYear();
+
+const selDen = document.getElementById('den');
+for (let d = 1; d <= 31; d++) {
+  const o = document.createElement('option');
+  o.value = d;
+  o.textContent = d + '. den';
+  if (d === dnes.getDate()) o.selected = true;
+  selDen.appendChild(o);
+}
+
+function toggleB() {
+  const s = document.getElementById('sekce-b');
+  const btn = document.getElementById('toggle-b');
+  const open = s.style.display === 'none';
+  s.style.display = open ? 'block' : 'none';
+  btn.textContent = open ? '− Odebrat druhou stavbu' : '+ Přidat druhou stavbu (nepovinné)';
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideError() {
+  document.getElementById('error-msg').style.display = 'none';
+}
+
+async function odeslat() {
+  hideError();
+  const prac    = document.getElementById('pracovnik').value;
+  const den     = document.getElementById('den').value;
+  const stavbaA = document.getElementById('stavbaA').value;
+  const etapaA  = document.getElementById('etapaA').value;
+  const hodinyA = parseFloat(document.getElementById('hodinyA').value);
+
+  if (!prac)              { showError('Vyber prosím své jméno.'); return; }
+  if (!stavbaA)           { showError('Vyber prosím stavbu.'); return; }
+  if (!etapaA)            { showError('Vyber prosím etapu.'); return; }
+  if (!hodinyA || hodinyA <= 0) { showError('Zadej prosím počet hodin.'); return; }
+
+  const stavbaB = document.getElementById('stavbaB').value;
+  const etapaB  = document.getElementById('etapaB').value;
+  const hodinyB = parseFloat(document.getElementById('hodinyB').value) || 0;
+  const poznamka = document.getElementById('poznamka').value;
+
+  const data = { prac, den, stavbaA, etapaA, hodinyA, stavbaB, etapaB, hodinyB, poznamka };
+
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('spinner').style.display = 'block';
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    let detail = prac + ' · den ' + den + '\n' + stavbaA + ' · ' + etapaA + ' · ' + hodinyA + ' h';
+    if (stavbaB && hodinyB > 0) detail += '\n' + stavbaB + ' · ' + etapaB + ' · ' + hodinyB + ' h';
+
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('success-area').style.display = 'block';
+    document.getElementById('success-detail').textContent = detail;
+  } catch(e) {
+    showError('Nepodařilo se odeslat. Zkontroluj připojení a zkus znovu.');
+    document.getElementById('submit-btn').disabled = false;
+  }
+  document.getElementById('spinner').style.display = 'none';
+}
+
+function reset() {
+  ['pracovnik','stavbaA','etapaA','hodinyA','stavbaB','etapaB','hodinyB','poznamka']
+    .forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('den').value = dnes.getDate();
+  document.getElementById('sekce-b').style.display = 'none';
+  document.getElementById('toggle-b').textContent = '+ Přidat druhou stavbu (nepovinné)';
+  document.getElementById('success-area').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+  document.getElementById('submit-btn').disabled = false;
+  hideError();
+}
+</script>
+</body>
+</html>
