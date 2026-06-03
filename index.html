@@ -8,7 +8,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; padding: 1rem; }
   .wrap { max-width: 420px; margin: 0 auto; }
-  .top-bar { background: #1F4E78; color: white; padding: 14px 16px; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 10px; }
+  .top-bar { background: #1F4E78; color: white; padding: 14px 16px; border-radius: 12px 12px 0 0; }
   .top-bar h1 { font-size: 16px; font-weight: 600; }
   .top-bar span { font-size: 12px; opacity: .75; display: block; }
   .body { background: white; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; padding: 1.25rem; }
@@ -21,8 +21,7 @@
   .section-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #94a3b8; text-transform: uppercase; margin: 1.25rem 0 .75rem; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; }
   .toggle-btn { font-size: 13px; color: #2563eb; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: .75rem; background: none; border: none; padding: 0; }
   .optional-section { border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 1rem; background: #fafafa; }
-  .submit-btn { width: 100%; padding: 14px; border-radius: 8px; background: #1F4E78; border: none; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: .5rem; transition: opacity .15s; }
-  .submit-btn:hover { opacity: .9; }
+  .submit-btn { width: 100%; padding: 14px; border-radius: 8px; background: #1F4E78; border: none; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: .5rem; }
   .submit-btn:disabled { opacity: .6; cursor: not-allowed; }
   .success { display: none; text-align: center; padding: 2rem 1rem; }
   .success h2 { font-size: 20px; font-weight: 600; color: #1e293b; margin: 1rem 0 .5rem; }
@@ -35,16 +34,12 @@
 <body>
 <div class="wrap">
   <div class="top-bar">
-    <div>
-      <h1>Denní výkaz</h1>
-      <span id="dnes-label"></span>
-    </div>
+    <h1>Denní výkaz</h1>
+    <span id="dnes-label"></span>
   </div>
-
   <div class="body">
     <div id="form-area">
       <div id="error-msg" class="error-msg"></div>
-
       <div class="two-col">
         <div class="field">
           <label>Pracovník</label>
@@ -66,76 +61,46 @@
           <select id="den"></select>
         </div>
       </div>
-
       <p class="section-label">Stavba A</p>
       <div class="field">
         <label>Stavba</label>
         <select id="stavbaA">
           <option value="">— vyber stavbu —</option>
-          <option>RD Špaček_Damníkov</option>
-          <option>RD Orsák_Vnorovy</option>
-          <option>RD Fuhrmannovi_Vésky</option>
-          <option>RD Kolář 3_Želatovice</option>
-          <option>RD Skřivánkovi_Stupava</option>
-          <option>RD Kotolan_Újezd u Brna</option>
-          <option>RD Šupková_Uherský Brod</option>
-          <option>RD Vlkovi_Tlumačov</option>
-          <option>RD Hampl/Benešová_Starovice</option>
-          <option>RD Šimeček V._Kudlov</option>
-          <option>RD Šimeček K_Kudlov</option>
-          <option>RD Valčíkovi_Brumov Bylnice</option>
-          <option>RD Rybář/Michalec_Kukle</option>
-          <option>RD Foltýnová_Strážnice</option>
-          <option>RD Kolář 1_Dobrotice</option>
-          <option>RD Kolář 2_Dobrotice</option>
-          <option>RD Michalík_Uničov</option>
-          <option>RD Šibalová_Věteřov</option>
-          <option>RD Vzorový dům_Staré Město</option>
-          <option>Hala_Staré Město</option>
+          <option>RD Špaček_Damníkov</option><option>RD Orsák_Vnorovy</option>
+          <option>RD Fuhrmannovi_Vésky</option><option>RD Kolář 3_Želatovice</option>
+          <option>RD Skřivánkovi_Stupava</option><option>RD Kotolan_Újezd u Brna</option>
+          <option>RD Šupková_Uherský Brod</option><option>RD Vlkovi_Tlumačov</option>
+          <option>RD Hampl/Benešová_Starovice</option><option>RD Šimeček V._Kudlov</option>
+          <option>RD Šimeček K_Kudlov</option><option>RD Valčíkovi_Brumov Bylnice</option>
+          <option>RD Rybář/Michalec_Kukle</option><option>RD Foltýnová_Strážnice</option>
+          <option>RD Kolář 1_Dobrotice</option><option>RD Kolář 2_Dobrotice</option>
+          <option>RD Michalík_Uničov</option><option>RD Šibalová_Věteřov</option>
+          <option>RD Vzorový dům_Staré Město</option><option>Hala_Staré Město</option>
         </select>
       </div>
       <div class="field">
         <label>Etapa / Práce</label>
         <select id="etapaA">
           <option value="">— vyber etapu —</option>
-          <option>VOLNO</option>
-          <option>Úklid stavby</option>
-          <option>Závoz materiálu</option>
-          <option>Reklamní plachta</option>
-          <option>Základová deska</option>
-          <option>Hydroizolace ZD</option>
-          <option>Výroba</option>
-          <option>Nakládka</option>
-          <option>Hrubá stavba spoje</option>
-          <option>Podbetonování</option>
-          <option>Komín</option>
-          <option>Pochozí půda</option>
-          <option>Palubky nátěr</option>
-          <option>Palubky montáž</option>
-          <option>Parotěsnost strop/prolepení</option>
-          <option>Parotěsnost bitumen</option>
-          <option>Parotěsnost izolace odpadů</option>
-          <option>BD test</option>
-          <option>Záklop obvodových stěn</option>
-          <option>Podlahový polystyren</option>
-          <option>Zpětný spoj</option>
-          <option>Fasáda</option>
-          <option>Patky pod TČ</option>
-          <option>Broušení podlah</option>
-          <option>Rekuperace rozvody</option>
-          <option>Rekuperace kompletace</option>
-          <option>Interiérové práce</option>
-          <option>Obklady a dlažby</option>
-          <option>Výkopové práce IS</option>
-          <option>Reklamace</option>
-          <option>Oprava vlastní práce</option>
+          <option>VOLNO</option><option>Úklid stavby</option><option>Závoz materiálu</option>
+          <option>Reklamní plachta</option><option>Základová deska</option><option>Hydroizolace ZD</option>
+          <option>Výroba</option><option>Nakládka</option><option>Hrubá stavba spoje</option>
+          <option>Podbetonování</option><option>Komín</option><option>Pochozí půda</option>
+          <option>Palubky nátěr</option><option>Palubky montáž</option>
+          <option>Parotěsnost strop/prolepení</option><option>Parotěsnost bitumen</option>
+          <option>Parotěsnost izolace odpadů</option><option>BD test</option>
+          <option>Záklop obvodových stěn</option><option>Podlahový polystyren</option>
+          <option>Zpětný spoj</option><option>Fasáda</option><option>Patky pod TČ</option>
+          <option>Broušení podlah</option><option>Rekuperace rozvody</option>
+          <option>Rekuperace kompletace</option><option>Interiérové práce</option>
+          <option>Obklady a dlažby</option><option>Výkopové práce IS</option>
+          <option>Reklamace</option><option>Oprava vlastní práce</option>
         </select>
       </div>
       <div class="field">
         <label>Počet hodin</label>
         <input type="number" id="hodinyA" min="0.5" max="16" step="0.5" placeholder="8" />
       </div>
-
       <button class="toggle-btn" id="toggle-b" onclick="toggleB()">+ Přidat druhou stavbu (nepovinné)</button>
       <div id="sekce-b" style="display:none;">
         <div class="optional-section">
@@ -144,63 +109,35 @@
             <label>Stavba</label>
             <select id="stavbaB">
               <option value="">— vyber stavbu —</option>
-              <option>RD Špaček_Damníkov</option>
-              <option>RD Orsák_Vnorovy</option>
-              <option>RD Fuhrmannovi_Vésky</option>
-              <option>RD Kolář 3_Želatovice</option>
-              <option>RD Skřivánkovi_Stupava</option>
-              <option>RD Kotolan_Újezd u Brna</option>
-              <option>RD Šupková_Uherský Brod</option>
-              <option>RD Vlkovi_Tlumačov</option>
-              <option>RD Hampl/Benešová_Starovice</option>
-              <option>RD Šimeček V._Kudlov</option>
-              <option>RD Šimeček K_Kudlov</option>
-              <option>RD Valčíkovi_Brumov Bylnice</option>
-              <option>RD Rybář/Michalec_Kukle</option>
-              <option>RD Foltýnová_Strážnice</option>
-              <option>RD Kolář 1_Dobrotice</option>
-              <option>RD Kolář 2_Dobrotice</option>
-              <option>RD Michalík_Uničov</option>
-              <option>RD Šibalová_Věteřov</option>
-              <option>RD Vzorový dům_Staré Město</option>
-              <option>Hala_Staré Město</option>
+              <option>RD Špaček_Damníkov</option><option>RD Orsák_Vnorovy</option>
+              <option>RD Fuhrmannovi_Vésky</option><option>RD Kolář 3_Želatovice</option>
+              <option>RD Skřivánkovi_Stupava</option><option>RD Kotolan_Újezd u Brna</option>
+              <option>RD Šupková_Uherský Brod</option><option>RD Vlkovi_Tlumačov</option>
+              <option>RD Hampl/Benešová_Starovice</option><option>RD Šimeček V._Kudlov</option>
+              <option>RD Šimeček K_Kudlov</option><option>RD Valčíkovi_Brumov Bylnice</option>
+              <option>RD Rybář/Michalec_Kukle</option><option>RD Foltýnová_Strážnice</option>
+              <option>RD Kolář 1_Dobrotice</option><option>RD Kolář 2_Dobrotice</option>
+              <option>RD Michalík_Uničov</option><option>RD Šibalová_Věteřov</option>
+              <option>RD Vzorový dům_Staré Město</option><option>Hala_Staré Město</option>
             </select>
           </div>
           <div class="field">
             <label>Etapa / Práce</label>
             <select id="etapaB">
               <option value="">— vyber etapu —</option>
-              <option>VOLNO</option>
-              <option>Úklid stavby</option>
-              <option>Závoz materiálu</option>
-              <option>Reklamní plachta</option>
-              <option>Základová deska</option>
-              <option>Hydroizolace ZD</option>
-              <option>Výroba</option>
-              <option>Nakládka</option>
-              <option>Hrubá stavba spoje</option>
-              <option>Podbetonování</option>
-              <option>Komín</option>
-              <option>Pochozí půda</option>
-              <option>Palubky nátěr</option>
-              <option>Palubky montáž</option>
-              <option>Parotěsnost strop/prolepení</option>
-              <option>Parotěsnost bitumen</option>
-              <option>Parotěsnost izolace odpadů</option>
-              <option>BD test</option>
-              <option>Záklop obvodových stěn</option>
-              <option>Podlahový polystyren</option>
-              <option>Zpětný spoj</option>
-              <option>Fasáda</option>
-              <option>Patky pod TČ</option>
-              <option>Broušení podlah</option>
-              <option>Rekuperace rozvody</option>
-              <option>Rekuperace kompletace</option>
-              <option>Interiérové práce</option>
-              <option>Obklady a dlažby</option>
-              <option>Výkopové práce IS</option>
-              <option>Reklamace</option>
-              <option>Oprava vlastní práce</option>
+              <option>VOLNO</option><option>Úklid stavby</option><option>Závoz materiálu</option>
+              <option>Reklamní plachta</option><option>Základová deska</option><option>Hydroizolace ZD</option>
+              <option>Výroba</option><option>Nakládka</option><option>Hrubá stavba spoje</option>
+              <option>Podbetonování</option><option>Komín</option><option>Pochozí půda</option>
+              <option>Palubky nátěr</option><option>Palubky montáž</option>
+              <option>Parotěsnost strop/prolepení</option><option>Parotěsnost bitumen</option>
+              <option>Parotěsnost izolace odpadů</option><option>BD test</option>
+              <option>Záklop obvodových stěn</option><option>Podlahový polystyren</option>
+              <option>Zpětný spoj</option><option>Fasáda</option><option>Patky pod TČ</option>
+              <option>Broušení podlah</option><option>Rekuperace rozvody</option>
+              <option>Rekuperace kompletace</option><option>Interiérové práce</option>
+              <option>Obklady a dlažby</option><option>Výkopové práce IS</option>
+              <option>Reklamace</option><option>Oprava vlastní práce</option>
             </select>
           </div>
           <div class="field">
@@ -209,16 +146,13 @@
           </div>
         </div>
       </div>
-
       <div class="field">
         <label>Poznámka (nepovinné)</label>
         <input type="text" id="poznamka" placeholder="např. přesčas, jízda..." />
       </div>
-
       <div class="spinner" id="spinner">Odesílám...</div>
       <button class="submit-btn" id="submit-btn" onclick="odeslat()">Odeslat výkaz</button>
     </div>
-
     <div class="success" id="success-area">
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <circle cx="26" cy="26" r="24" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
@@ -230,29 +164,19 @@
     </div>
   </div>
 </div>
-
 <script>
-// ════════════════════════════════════════════════════════
-// URL Google Apps Scriptu — sem vložte vaši URL po nasazení
-// ════════════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyF-jfD7JEkhrpAWSFJvLJmluMo-cffjtF1I7M2PSd109ZZ2aXdrlzgmeq_ZFRHfQa9/exec';
-// ════════════════════════════════════════════════════════
-
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwma2iPEtTlgo_WEunukitvI4XQPlX631cXedVHIES6RInTyMReL-mM6tmbb5rDUA4V/exec';
 const dnes = new Date();
 const dny = ['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'];
 const mesice = ['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
-document.getElementById('dnes-label').textContent =
-  dny[dnes.getDay()] + ' ' + dnes.getDate() + '. ' + mesice[dnes.getMonth()] + ' ' + dnes.getFullYear();
-
+document.getElementById('dnes-label').textContent = dny[dnes.getDay()] + ' ' + dnes.getDate() + '. ' + mesice[dnes.getMonth()] + ' ' + dnes.getFullYear();
 const selDen = document.getElementById('den');
 for (let d = 1; d <= 31; d++) {
   const o = document.createElement('option');
-  o.value = d;
-  o.textContent = d + '. den';
+  o.value = d; o.textContent = d + '. den';
   if (d === dnes.getDate()) o.selected = true;
   selDen.appendChild(o);
 }
-
 function toggleB() {
   const s = document.getElementById('sekce-b');
   const btn = document.getElementById('toggle-b');
@@ -260,52 +184,31 @@ function toggleB() {
   s.style.display = open ? 'block' : 'none';
   btn.textContent = open ? '− Odebrat druhou stavbu' : '+ Přidat druhou stavbu (nepovinné)';
 }
-
-function showError(msg) {
-  const el = document.getElementById('error-msg');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-function hideError() {
-  document.getElementById('error-msg').style.display = 'none';
-}
-
+function showError(msg) { const el = document.getElementById('error-msg'); el.textContent = msg; el.style.display = 'block'; }
+function hideError() { document.getElementById('error-msg').style.display = 'none'; }
 async function odeslat() {
   hideError();
-  const prac    = document.getElementById('pracovnik').value;
-  const den     = document.getElementById('den').value;
+  const prac = document.getElementById('pracovnik').value;
+  const den = document.getElementById('den').value;
   const stavbaA = document.getElementById('stavbaA').value;
-  const etapaA  = document.getElementById('etapaA').value;
+  const etapaA = document.getElementById('etapaA').value;
   const hodinyA = parseFloat(document.getElementById('hodinyA').value);
-
-  if (!prac)                   { showError('Vyber prosím své jméno.'); return; }
-  if (!stavbaA)                { showError('Vyber prosím stavbu.'); return; }
-  if (!etapaA)                 { showError('Vyber prosím etapu.'); return; }
-  if (!hodinyA || hodinyA <= 0){ showError('Zadej prosím počet hodin.'); return; }
-
-  const bOpen   = document.getElementById('sekce-b').style.display !== 'none';
+  if (!prac) { showError('Vyber prosím své jméno.'); return; }
+  if (!stavbaA) { showError('Vyber prosím stavbu.'); return; }
+  if (!etapaA) { showError('Vyber prosím etapu.'); return; }
+  if (!hodinyA || hodinyA <= 0) { showError('Zadej prosím počet hodin.'); return; }
+  const bOpen = document.getElementById('sekce-b').style.display !== 'none';
   const stavbaB = bOpen ? document.getElementById('stavbaB').value : '';
-  const etapaB  = bOpen ? document.getElementById('etapaB').value  : '';
+  const etapaB = bOpen ? document.getElementById('etapaB').value : '';
   const hodinyB = bOpen ? (parseFloat(document.getElementById('hodinyB').value) || 0) : 0;
   const poznamka = document.getElementById('poznamka').value;
-
   const data = { prac, den: parseInt(den), stavbaA, etapaA, hodinyA, stavbaB, etapaB, hodinyB, poznamka };
-
   document.getElementById('submit-btn').disabled = true;
   document.getElementById('spinner').style.display = 'block';
-
   try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
+    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     let detail = prac + ' · den ' + den + '\n' + stavbaA + ' · ' + etapaA + ' · ' + hodinyA + ' h';
     if (stavbaB && hodinyB > 0) detail += '\n' + stavbaB + ' · ' + etapaB + ' · ' + hodinyB + ' h';
-
     document.getElementById('form-area').style.display = 'none';
     document.getElementById('success-area').style.display = 'block';
     document.getElementById('success-detail').textContent = detail;
@@ -315,10 +218,8 @@ async function odeslat() {
   }
   document.getElementById('spinner').style.display = 'none';
 }
-
 function reset() {
-  ['pracovnik','stavbaA','etapaA','hodinyA','stavbaB','etapaB','hodinyB','poznamka']
-    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['pracovnik','stavbaA','etapaA','hodinyA','stavbaB','etapaB','hodinyB','poznamka'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('den').value = dnes.getDate();
   document.getElementById('sekce-b').style.display = 'none';
   document.getElementById('toggle-b').textContent = '+ Přidat druhou stavbu (nepovinné)';
