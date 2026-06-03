@@ -206,7 +206,7 @@ async function odeslat() {
   document.getElementById('submit-btn').disabled = true;
   document.getElementById('spinner').style.display = 'block';
   try {
-    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) });
     let detail = prac + ' · den ' + den + '\n' + stavbaA + ' · ' + etapaA + ' · ' + hodinyA + ' h';
     if (stavbaB && hodinyB > 0) detail += '\n' + stavbaB + ' · ' + etapaB + ' · ' + hodinyB + ' h';
     document.getElementById('form-area').style.display = 'none';
