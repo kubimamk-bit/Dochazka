@@ -7,15 +7,16 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; padding: 1rem; }
-  .wrap { max-width: 420px; margin: 0 auto; }
+  .wrap { max-width: 440px; margin: 0 auto; }
   .top-bar { background: #1F4E78; color: white; padding: 14px 16px; border-radius: 12px 12px 0 0; }
   .top-bar h1 { font-size: 16px; font-weight: 600; }
   .top-bar span { font-size: 12px; opacity: .75; display: block; }
   .body { background: white; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; padding: 1.25rem; }
   .field { margin-bottom: 1rem; }
   .field label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 5px; letter-spacing: .04em; text-transform: uppercase; }
-  .field select, .field input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 15px; color: #1e293b; -webkit-appearance: none; }
+  .field select, .field input[type=text] { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 15px; color: #1e293b; -webkit-appearance: none; }
   .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: #f8fafc; padding-right: 32px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .section-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #94a3b8; text-transform: uppercase; margin: 1.25rem 0 .75rem; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; }
   .toggle-btn { font-size: 13px; color: #2563eb; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: .75rem; background: none; border: none; padding: 0; }
@@ -28,6 +29,7 @@
   .new-btn { margin-top: 1.5rem; padding: 10px 24px; border-radius: 8px; border: 1px solid #cbd5e1; background: transparent; color: #1e293b; font-size: 14px; cursor: pointer; }
   .error-msg { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 1rem; display: none; }
   .spinner { display: none; text-align: center; font-size: 14px; color: #64748b; padding: .5rem; }
+  .loading-info { text-align: center; padding: 8px; font-size: 13px; color: #94a3b8; }
 </style>
 </head>
 <body>
@@ -39,27 +41,35 @@
   <div class="body">
     <div id="form-area">
       <div id="error-msg" class="error-msg"></div>
+
+      <!-- Pracovník -->
+      <div class="field">
+        <label>Pracovník</label>
+        <select id="pracovnik">
+          <option value="">Načítám seznam…</option>
+        </select>
+      </div>
+
+      <!-- Měsíc / Den -->
       <div class="two-col">
         <div class="field">
-          <label>Pracovník</label>
-          <select id="pracovnik">
-            <option value="">— vyber jméno —</option>
-            <option>Jan Pavka</option>
-            <option>Petr Píža</option>
-            <option>Erik Slezák</option>
-            <option>David Malík</option>
-            <option>Christian Kozel</option>
-            <option>Michal Barshai</option>
-            <option>Ihor Menzhul</option>
-            <option>Ivan Drobotov</option>
-            <option>Constantin Covalschi</option>
+          <label>Měsíc</label>
+          <select id="mesic">
+            <option value="1">Leden</option><option value="2">Únor</option>
+            <option value="3">Březen</option><option value="4">Duben</option>
+            <option value="5">Květen</option><option value="6">Červen</option>
+            <option value="7">Červenec</option><option value="8">Srpen</option>
+            <option value="9">Září</option><option value="10">Říjen</option>
+            <option value="11">Listopad</option><option value="12">Prosinec</option>
           </select>
         </div>
         <div class="field">
-          <label>Den v měsíci</label>
+          <label>Den</label>
           <select id="den"></select>
         </div>
       </div>
+
+      <!-- Stavba A -->
       <p class="section-label">Stavba A</p>
       <div class="field">
         <label>Stavba</label>
@@ -110,6 +120,8 @@
           <option>14.5</option><option>15</option><option>15.5</option><option>16</option>
         </select>
       </div>
+
+      <!-- Stavba B (nepovinná) -->
       <button class="toggle-btn" id="toggle-b" onclick="toggleB()">+ Přidat druhou stavbu (nepovinné)</button>
       <div id="sekce-b" style="display:none;">
         <div class="optional-section">
@@ -135,7 +147,6 @@
             <select id="etapaB">
               <option value="">— vyber etapu —</option>
               <option>VOLNO</option><option>Úklid stavby</option><option>Závoz materiálu</option>
-              <option>Reklamní plachta</option><option>Závoz materiálu</option>
               <option>Reklamní plachta</option><option>Základová deska</option><option>Hydroizolace ZD</option>
               <option>Výroba</option><option>Nakládka</option><option>Hrubá stavba spoje</option>
               <option>Podbetonování</option><option>Komín</option><option>Pochozí půda</option>
@@ -166,13 +177,16 @@
           </div>
         </div>
       </div>
+
       <div class="field">
         <label>Poznámka (nepovinné)</label>
         <input type="text" id="poznamka" placeholder="např. přesčas, jízda..." />
       </div>
-      <div class="spinner" id="spinner">Odesílám...</div>
+      <div class="spinner" id="spinner">Odesílám…</div>
       <button class="submit-btn" id="submit-btn" onclick="odeslat()">Odeslat výkaz</button>
     </div>
+
+    <!-- Potvrzení -->
     <div class="success" id="success-area">
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <circle cx="26" cy="26" r="24" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
@@ -184,19 +198,53 @@
     </div>
   </div>
 </div>
+
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxnzEtztu6ZNirpMsLv1E5W8084J08inpH-AQr-3_fEO1ggDIhuX5-ToShn9e8Syv1oUQ/exec';
+// ── Sem vlož URL po nasazení ──
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzoTM8orIRJdkofCa-UyLuWMBbdT24dnhUN6XNowiY5JmkhMROgIwYQkC8uesu3pfTu/exec';
+
+const MESICE = ['','Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'];
 const dnes = new Date();
-const dny = ['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'];
-const mesice = ['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
-document.getElementById('dnes-label').textContent = dny[dnes.getDay()] + ' ' + dnes.getDate() + '. ' + mesice[dnes.getMonth()] + ' ' + dnes.getFullYear();
+
+// Nastav dnešní datum
+document.getElementById('dnes-label').textContent =
+  ['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'][dnes.getDay()] +
+  ' ' + dnes.getDate() + '. ' + MESICE[dnes.getMonth()+1] + ' ' + dnes.getFullYear();
+
+// Nastav aktuální měsíc
+document.getElementById('mesic').value = dnes.getMonth() + 1;
+
+// Naplň dny
 const selDen = document.getElementById('den');
 for (let d = 1; d <= 31; d++) {
   const o = document.createElement('option');
-  o.value = d; o.textContent = d + '. den';
+  o.value = d; o.textContent = d + '.';
   if (d === dnes.getDate()) o.selected = true;
   selDen.appendChild(o);
 }
+
+// Načti zaměstnance ze scriptu
+async function nactiZamestnance() {
+  const sel = document.getElementById('pracovnik');
+  try {
+    const res = await fetch(SCRIPT_URL);
+    const json = await res.json();
+    if (json.ok && json.zamestnanci.length > 0) {
+      sel.innerHTML = '<option value="">— vyber jméno —</option>';
+      json.zamestnanci.forEach(z => {
+        const o = document.createElement('option');
+        o.value = z.jmeno; o.textContent = z.jmeno;
+        sel.appendChild(o);
+      });
+    } else {
+      sel.innerHTML = '<option value="">Žádní zaměstnanci (doplň do tabulky)</option>';
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">Chyba načítání — zkus obnovit</option>';
+  }
+}
+nactiZamestnance();
+
 function toggleB() {
   const s = document.getElementById('sekce-b');
   const btn = document.getElementById('toggle-b');
@@ -204,42 +252,54 @@ function toggleB() {
   s.style.display = open ? 'block' : 'none';
   btn.textContent = open ? '− Odebrat druhou stavbu' : '+ Přidat druhou stavbu (nepovinné)';
 }
+
 function showError(msg) { const el = document.getElementById('error-msg'); el.textContent = msg; el.style.display = 'block'; }
 function hideError() { document.getElementById('error-msg').style.display = 'none'; }
+
 async function odeslat() {
   hideError();
-  const prac = document.getElementById('pracovnik').value;
-  const den = document.getElementById('den').value;
-  const stavbaA = document.getElementById('stavbaA').value;
-  const etapaA = document.getElementById('etapaA').value;
-  const hodinyA = parseFloat(document.getElementById('hodinyA').value);
-  if (!prac) { showError('Vyber prosím své jméno.'); return; }
+  const prac     = document.getElementById('pracovnik').value;
+  const mesic    = document.getElementById('mesic').value;
+  const den      = document.getElementById('den').value;
+  const stavbaA  = document.getElementById('stavbaA').value;
+  const etapaA   = document.getElementById('etapaA').value;
+  const hodinyA  = document.getElementById('hodinyA').value;
+  if (!prac)    { showError('Vyber prosím své jméno.'); return; }
   if (!stavbaA) { showError('Vyber prosím stavbu.'); return; }
-  if (!etapaA) { showError('Vyber prosím etapu.'); return; }
-  if (!hodinyA || hodinyA <= 0) { showError('Zadej prosím počet hodin.'); return; }
-  const bOpen = document.getElementById('sekce-b').style.display !== 'none';
+  if (!etapaA)  { showError('Vyber prosím etapu.'); return; }
+  if (!hodinyA) { showError('Vyber prosím počet hodin.'); return; }
+
+  const bOpen   = document.getElementById('sekce-b').style.display !== 'none';
   const stavbaB = bOpen ? document.getElementById('stavbaB').value : '';
-  const etapaB = bOpen ? document.getElementById('etapaB').value : '';
-  const hodinyB = bOpen ? (parseFloat(document.getElementById('hodinyB').value) || 0) : 0;
+  const etapaB  = bOpen ? document.getElementById('etapaB').value : '';
+  const hodinyB = bOpen ? (document.getElementById('hodinyB').value || 0) : 0;
   const poznamka = document.getElementById('poznamka').value;
-  const data = { prac, den: parseInt(den), stavbaA, etapaA, hodinyA, stavbaB, etapaB, hodinyB, poznamka };
+
+  const data = { prac, mesic: parseInt(mesic), den: parseInt(den), stavbaA, etapaA, hodinyA: parseFloat(hodinyA), stavbaB, etapaB, hodinyB: parseFloat(hodinyB)||0, poznamka };
+
   document.getElementById('submit-btn').disabled = true;
   document.getElementById('spinner').style.display = 'block';
+
   try {
     await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) });
-    let detail = prac + ' · den ' + den + '\n' + stavbaA + ' · ' + etapaA + ' · ' + hodinyA + ' h';
-    if (stavbaB && hodinyB > 0) detail += '\n' + stavbaB + ' · ' + etapaB + ' · ' + hodinyB + ' h';
+    let detail = prac + '\n' + MESICE[parseInt(mesic)] + ' · den ' + den + '\n' + stavbaA + ' · ' + etapaA + ' · ' + hodinyA + ' h';
+    if (stavbaB && parseFloat(hodinyB) > 0) detail += '\n' + stavbaB + ' · ' + etapaB + ' · ' + hodinyB + ' h';
     document.getElementById('form-area').style.display = 'none';
     document.getElementById('success-area').style.display = 'block';
     document.getElementById('success-detail').textContent = detail;
   } catch(e) {
-    showError('Nepodařilo se odeslat. Zkontroluj připojení a zkus znovu.');
+    showError('Nepodařilo se odeslat. Zkontroluj připojení.');
     document.getElementById('submit-btn').disabled = false;
   }
   document.getElementById('spinner').style.display = 'none';
 }
+
 function reset() {
-  ['pracovnik','stavbaA','etapaA','hodinyA','stavbaB','etapaB','hodinyB','poznamka'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['stavbaA','etapaA','hodinyA','stavbaB','etapaB','hodinyB','poznamka'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('pracovnik').value = '';
+  document.getElementById('mesic').value = dnes.getMonth() + 1;
   document.getElementById('den').value = dnes.getDate();
   document.getElementById('sekce-b').style.display = 'none';
   document.getElementById('toggle-b').textContent = '+ Přidat druhou stavbu (nepovinné)';
