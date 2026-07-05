@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEO Dashboard — Morava House</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue:   #1F4E78;
+    --blue2:  #2E75B6;
+    --green:  #2E7D32;
+    --green2: #4CAF50;
+    --red:    #C62828;
+    --red2:   #EF5350;
+    --orange: #E65100;
+    --bg:     #F0F4F8;
+    --card:   #FFFFFF;
+    --border: #E2E8F0;
+    --text:   #1E293B;
+    --muted:  #64748B;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--blue);
+    color: white;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .topbar-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .topbar-sub  { font-size: 12px; opacity: .7; letter-spacing: .05em; text-transform: uppercase; }
+  .topbar-right { font-size: 12px; opacity: .75; text-align: right; }
+  .topbar-right strong { font-size: 13px; opacity: 1; }
+
+  /* ── LOADING / ERROR ── */
+  #loading { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 15px; }
+  #error-box { display: none; background: #FFF0F0; border: 1px solid #FFCDD2; color: var(--red); padding: 16px 24px; margin: 20px; border-radius: 10px; font-size: 14px; }
+
+  /* ── LAYOUT ── */
+  .main { max-width: 1200px; margin: 0 auto; padding: 24px 20px; display: none; }
+
+  /* ── KPI TILES ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent, var(--blue));
+  }
+  .kpi-card .label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+  .kpi-card .value { font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--text); }
+  .kpi-card .sub   { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .kpi-card .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: 6px; }
+  .badge-green  { background: #E8F5E9; color: var(--green); }
+  .badge-red    { background: #FFEBEE; color: var(--red); }
+  .badge-orange { background: #FFF3E0; color: var(--orange); }
+
+  /* ── SECTION TITLE ── */
+  .section-title { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+  /* ── CARD ── */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
+
+  /* ── CHART ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── RISK TABLE ── */
+  .risk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .risk-table th { text-align: left; padding: 8px 12px; background: #F8FAFC; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; border-bottom: 2px solid var(--border); }
+  .risk-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .risk-table tr:last-child td { border-bottom: none; }
+  .risk-table tr:hover td { background: #F8FAFC; }
+  .td-num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+  .td-neg { color: var(--red); font-weight: 700; }
+  .td-warn { color: var(--orange); font-weight: 600; }
+  .td-ok   { color: var(--green); }
+  .progress-bar { height: 6px; background: #E2E8F0; border-radius: 4px; overflow: hidden; min-width: 80px; }
+  .progress-fill { height: 100%; border-radius: 4px; }
+
+  /* ── ALL PROJECTS TABLE ── */
+  .proj-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .proj-table th { text-align: left; padding: 8px 12px; background: #F8FAFC; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; border-bottom: 2px solid var(--border); white-space: nowrap; }
+  .proj-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .proj-table tr:last-child td { border-bottom: none; }
+  .proj-table tr:hover td { background: #F8FAFC; }
+
+  /* ── FOOTER ── */
+  .footer { text-align: center; font-size: 11px; color: var(--muted); padding: 24px 0 12px; }
+
+  @media (max-width: 600px) {
+    .topbar { padding: 12px 16px; }
+    .kpi-card .value { font-size: 20px; }
+    .main { padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div>
+      <div class="topbar-logo">MORAVA HOUSE</div>
+      <div class="topbar-sub">Dřevostavby na klíč</div>
+    </div>
+    <div style="width:1px;height:36px;background:rgba(255,255,255,.2);margin:0 4px;"></div>
+    <div style="font-size:15px;font-weight:600;opacity:.9;">CEO Dashboard</div>
+  </div>
+  <div class="topbar-right">
+    <strong id="top-date">—</strong><br>
+    Aktualizace: <span id="top-updated">načítám…</span>
+  </div>
+</div>
+
+<div id="error-box">
+  ⚠️ Nepodařilo se načíst data. Zkontroluj URL v CEO_API_URL a že je Web App nasazena jako „Kdokoli".<br>
+  <small id="error-detail"></small>
+</div>
+
+<div id="loading">⏳ Načítám data z Google Sheets…</div>
+
+<div class="main" id="main">
+
+  <!-- KPI TILES -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="--accent:#1F4E78;">
+      <div class="label">Prostavěno celkem</div>
+      <div class="value" id="kpi-prostaveno">—</div>
+      <div class="sub">skutečně zhotovené práce</div>
+    </div>
+    <div class="kpi-card" style="--accent:#2E7D32;">
+      <div class="label">Profakturováno celkem</div>
+      <div class="value" id="kpi-profaktur">—</div>
+      <div class="sub" id="kpi-profaktur-pct">—</div>
+    </div>
+    <div class="kpi-card" style="--accent:#E65100;">
+      <div class="label">Bilanční rozdíl</div>
+      <div class="value" id="kpi-rozdil">—</div>
+      <div class="sub">prostavěno − profakturováno</div>
+      <span class="badge" id="kpi-rozdil-badge">—</span>
+    </div>
+    <div class="kpi-card" style="--accent:#5C6BC0;">
+      <div class="label">Projekty</div>
+      <div class="value" id="kpi-projekty">—</div>
+      <div class="sub" id="kpi-projekty-sub">—</div>
+    </div>
+  </div>
+
+  <!-- CHART: Prostavěno vs Profakturováno -->
+  <div class="card">
+    <div class="section-title">Prostavěno vs. Profakturováno — per projekt</div>
+    <div class="chart-wrap">
+      <canvas id="chartProPro" style="max-height:420px;"></canvas>
+    </div>
+  </div>
+
+  <!-- RIZIKOVÉ ZAKÁZKY -->
+  <div class="card" id="card-riziko" style="display:none;">
+    <div class="section-title">⚠️ Rizikové zakázky — nevyfakturovaný přebytek</div>
+    <table class="risk-table" id="risk-table">
+      <thead>
+        <tr>
+          <th>Zakázka</th>
+          <th class="td-num">Finální cena</th>
+          <th class="td-num">Prostavěno</th>
+          <th class="td-num">Profakturováno</th>
+          <th class="td-num">Rozdíl</th>
+          <th>Prostavěnost</th>
+        </tr>
+      </thead>
+      <tbody id="risk-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- VŠECHNY PROJEKTY -->
+  <div class="card">
+    <div class="section-title">Přehled všech zakázek</div>
+    <div style="overflow-x:auto;">
+      <table class="proj-table" id="proj-table">
+        <thead>
+          <tr>
+            <th>Zakázka</th>
+            <th class="td-num">Finální cena</th>
+            <th class="td-num">Prostavěno</th>
+            <th class="td-num">Profakturováno</th>
+            <th class="td-num">Rozdíl</th>
+            <th style="min-width:120px;">Prostavěnost %</th>
+          </tr>
+        </thead>
+        <tbody id="proj-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">Morava House s.r.o. &nbsp;·&nbsp; Data z Google Sheets (HQ OS v1 + Klienti)</div>
+</div>
+
+<script>
+// ⚠️ Po nasazení ceo_api.gs jako Web App, vlož URL sem:
+const CEO_API_URL = 'https://script.google.com/macros/s/AKfycbyhO8Hodhb-I_bMBk2vJINA_I19BSWSvtZ170Y33v3U0bcvoxkp4fwlFXwEsC-GOWyZ/exec';
+
+// ── Formátování ──────────────────────────────────────────────
+function fmtKc(n) {
+  if (n === null || n === undefined) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e6) return (n < 0 ? '−' : '') + (abs/1e6).toFixed(1).replace('.', ',') + ' mil. Kč';
+  return new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(n);
+}
+function fmtPct(n) { return n.toFixed(1).replace('.', ',') + ' %'; }
+const DNES = new Date();
+document.getElementById('top-date').textContent =
+  ['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'][DNES.getDay()] +
+  ' ' + DNES.getDate() + '. ' + ['','ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'][DNES.getMonth()+1] + ' ' + DNES.getFullYear();
+
+// ── Fetch & render ───────────────────────────────────────────
+async function loadData() {
+  try {
+    const res  = await fetch(CEO_API_URL);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'API chyba');
+    render(json);
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    const eb = document.getElementById('error-box');
+    eb.style.display = 'block';
+    document.getElementById('error-detail').textContent = e.message;
+  }
+}
+
+function render(d) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+
+  const s = d.summary;
+  const ts = new Date(d.lastUpdated);
+  document.getElementById('top-updated').textContent =
+    ts.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }) + ' · ' +
+    ts.toLocaleDateString('cs-CZ');
+
+  // KPI tiles
+  document.getElementById('kpi-prostaveno').textContent = fmtKc(s.totalProstaveno);
+  document.getElementById('kpi-profaktur').textContent  = fmtKc(s.totalProfakturovano);
+  const profPct = s.totalProstaveno > 0 ? s.totalProfakturovano / s.totalProstaveno * 100 : 0;
+  document.getElementById('kpi-profaktur-pct').textContent = fmtPct(profPct) + ' z prostavěného';
+
+  const rozEl = document.getElementById('kpi-rozdil');
+  rozEl.textContent = fmtKc(s.totalRozdil);
+  rozEl.style.color = s.totalRozdil < 0 ? 'var(--red)' : 'var(--green)';
+  const badge = document.getElementById('kpi-rozdil-badge');
+  if (s.totalRozdil < -500000) {
+    badge.textContent = '⚠️ Pozor — velký přebytek nevyfakturovaných prací';
+    badge.className = 'badge badge-red';
+  } else if (s.totalRozdil < 0) {
+    badge.textContent = 'Mírný nevyfakturovaný přebytek';
+    badge.className = 'badge badge-orange';
+  } else {
+    badge.textContent = '✓ V pořádku';
+    badge.className = 'badge badge-green';
+  }
+
+  document.getElementById('kpi-projekty').textContent = s.pocetProjektu;
+  document.getElementById('kpi-projekty-sub').textContent =
+    `${s.pocetAktivnich} aktivních · ${s.pocetRizikovych} rizikových`;
+
+  // Chart: Prostavěno vs Profakturováno
+  const sorted = [...d.projekty]
+    .filter(p => p.finalniCena > 0)
+    .sort((a, b) => b.prostaveno - a.prostaveno)
+    .slice(0, 25); // max 25 projektů
+
+  const labels  = sorted.map(p => p.nazev.length > 22 ? p.nazev.substring(0,21) + '…' : p.nazev);
+  const dataPro = sorted.map(p => p.prostaveno);
+  const dataPrf = sorted.map(p => p.profakturovano);
+
+  new Chart(document.getElementById('chartProPro'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Prostavěno (Kč)',
+          data: dataPro,
+          backgroundColor: 'rgba(31,78,120,0.85)',
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+        {
+          label: 'Profakturováno (Kč)',
+          data: dataPrf,
+          backgroundColor: 'rgba(46,125,50,0.75)',
+          borderRadius: 4,
+          borderSkipped: false,
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      indexAxis: 'y',
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + fmtKc(ctx.raw)
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            callback: v => v >= 1e6 ? (v/1e6).toFixed(1) + ' M' : v >= 1e3 ? (v/1e3).toFixed(0) + ' k' : v
+          },
+          grid: { color: 'rgba(0,0,0,.05)' }
+        },
+        y: {
+          ticks: { font: { size: 11 } }
+        }
+      }
+    }
+  });
+
+  // Rizikové zakázky
+  const rizikove = d.projekty.filter(p => p.rozdil < -100000).sort((a,b) => a.rozdil - b.rozdil);
+  if (rizikove.length > 0) {
+    document.getElementById('card-riziko').style.display = 'block';
+    const tbody = document.getElementById('risk-tbody');
+    rizikove.forEach(p => {
+      const pct = p.prostavěnostPct;
+      const pctColor = pct < 30 ? '#4CAF50' : pct < 70 ? '#FF9800' : '#1F4E78';
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${p.nazev}</strong></td>
+          <td class="td-num">${fmtKc(p.finalniCena)}</td>
+          <td class="td-num">${fmtKc(p.prostaveno)}</td>
+          <td class="td-num">${fmtKc(p.profakturovano)}</td>
+          <td class="td-num td-neg">${fmtKc(p.rozdil)}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="progress-bar" style="flex:1;">
+                <div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${pctColor};"></div>
+              </div>
+              <span style="font-size:12px;white-space:nowrap;color:${pctColor};font-weight:600;">${fmtPct(pct)}</span>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  // Všechny projekty
+  const allSorted = [...d.projekty].sort((a,b) => b.prostaveno - a.prostaveno);
+  const projTbody = document.getElementById('proj-tbody');
+  allSorted.forEach(p => {
+    const rozCls = p.rozdil < -300000 ? 'td-neg' : p.rozdil < -100000 ? 'td-warn' : p.rozdil > 0 ? 'td-ok' : '';
+    const pct = p.prostavěnostPct;
+    const pctColor = pct >= 90 ? '#1F4E78' : pct >= 50 ? '#FF9800' : '#4CAF50';
+    projTbody.innerHTML += `
+      <tr>
+        <td>${p.nazev}</td>
+        <td class="td-num">${fmtKc(p.finalniCena)}</td>
+        <td class="td-num">${fmtKc(p.prostaveno)}</td>
+        <td class="td-num">${fmtKc(p.profakturovano)}</td>
+        <td class="td-num ${rozCls}">${fmtKc(p.rozdil)}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="progress-bar" style="flex:1;">
+              <div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${pctColor};"></div>
+            </div>
+            <span style="font-size:12px;white-space:nowrap;">${fmtPct(pct)}</span>
+          </div>
+        </td>
+      </tr>`;
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>
